@@ -470,6 +470,10 @@
                     <input type="text" id="nomeProprietario" placeholder="Digite o nome completo do proprietário">
                 </div>
                 <div class="form-group">
+                    <label>RG:</label>
+                    <input type="number" id="rgProprietario" maxlength="14">
+                </div>
+                <div class="form-group">
                     <label>PIS/PASEP:</label>
                     <input type="text" id="pis" placeholder="000.00000.00-0" maxlength="14">
                 </div>
@@ -2007,6 +2011,7 @@
             // Seção 3: Informações do Proprietário
             adicionarSecao('3. INFORMAÇÕES DO PROPRIETÁRIO', [
                 { id: 'nomeProprietario', label: 'Nome Completo' },
+                { id: 'rgProprietario', label: 'RG:' },
                 { id: 'pis', label: 'PIS/PASEP' },
                 { id: 'cpf', label: 'CPF' },
                 { id: 'cnpj', label: 'CNPJ' },
