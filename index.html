@@ -2165,24 +2165,38 @@
 
             // Adicionar fotos se houver
             if (fotos.length > 0) {
-                pdf.addPage();
-                yPosition = 20;
-                pdf.setFontSize(12);
-                pdf.setFont(undefined, 'bold');
-                pdf.text('FOTOS DO PROJETO', marginLeft, yPosition);
-                yPosition += 15;
+    		    let fotoPorPagina = 0;
+   		        pdf.addPage();
+    		    yPosition = 15;
+    		    pdf.setFontSize(12);
+    		    pdf.setFont(undefined, 'bold');
+    		    pdf.text('FOTOS DO PROJETO', marginLeft, yPosition);
+    		    yPosition += 10;
 
-                fotos.forEach((foto, index) => {
-                    checkPageBreak(80);
-                    try {
-                        pdf.addImage(foto.data, 'JPEG', marginLeft, yPosition, 80, 60);
-                        pdf.setFont(undefined, 'normal');
-                        pdf.setFontSize(9);
-                        pdf.text(`Foto ${index + 1}: ${foto.name}`, marginLeft, yPosition + 65);
-                        yPosition += 75;
-                    } catch (error) {
-                        console.log('Erro ao adicionar foto:', error);
-                    }
+    		    fotos.forEach((foto, index) => {
+        	        try {
+                        // Verifica se já foram adicionadas 2 fotos nesta página
+                	    if (fotoPorPagina === 2) {
+                	        pdf.addPage();
+	                        yPosition = 10;
+        	                fotoPorPagina = 0;
+            	        }
+
+                        // Tamanhos ajustados para 2 fotos por página A4
+            		    const imgWidth = 170;
+            	    	const imgHeight = 120;
+
+            	    	pdf.addImage(foto.data, 'JPEG', marginLeft, yPosition, imgWidth, imgHeight);
+            	    	pdf.setFont(undefined, 'normal');
+            	    	pdf.setFontSize(10);
+            	    	pdf.text(`Foto ${index + 1}: ${foto.name}`, marginLeft, yPosition + imgHeight + 5);
+
+            	    	yPosition += imgHeight + 10; // espaço entre imagens
+            	    	fotoPorPagina++;
+
+            	    } catch (error) {
+            	    	console.log('Erro ao adicionar foto:', error);
+        	        }
                 });
             }
 
