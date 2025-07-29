@@ -1945,50 +1945,73 @@
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
 
-            let yPosition = 20;
+            let yPosition = 15;
             const pageHeight = 297;
             const marginLeft = 15;
             const marginRight = 195;
 
             // Função para adicionar nova página se necessário
             function checkPageBreak(heightNeeded = 10) {
-                if (yPosition + heightNeeded > pageHeight - 20) {
+                if (yPosition + heightNeeded > pageHeight - 10) {
                     pdf.addPage();
                     yPosition = 20;
                 }
             }
 
             // Cabeçalho igual ao formulário
-            pdf.setFontSize(14);
+            pdf.setFontSize(12);
             pdf.setFont(undefined, 'bold');
             pdf.text('PREFEITURA MUNICIPAL DE MADALENA', marginLeft, yPosition);
             yPosition += 5;
             pdf.setFontSize(10);
             pdf.text('Secretaria de Obras e Serviços Urbanos - Estado do Ceará', marginLeft, yPosition);
             yPosition += 5;
-            pdf.setFontSize(12);
+            pdf.setFontSize(8);
             pdf.text('BOLETIM DE CADASTRO IMOBILIÁRIO - BCI', marginLeft, yPosition);
             yPosition += 10;
 
-            // Função para adicionar seção (otimizada para menos páginas)
+            // Função para adicionar seção (otimizada para menos páginas e organizada em duas colunas)
             function adicionarSecao(titulo, campos) {
                 checkPageBreak(10);
-                pdf.setFontSize(11);
+                pdf.setFontSize(10);
                 pdf.setFont(undefined, 'bold');
                 pdf.text(titulo, marginLeft, yPosition);
                 yPosition += 6;
-
-                campos.forEach(campo => {
-                    if (campo.id && document.getElementById(campo.id)) {
-                        checkPageBreak(4);
-                        const valor = document.getElementById(campo.id).value || '-';
-                        pdf.setFont(undefined, 'normal');
-                        pdf.setFontSize(9);
-                        pdf.text(`${campo.label}: ${valor}`, marginLeft, yPosition);
-                        yPosition += 4;
-                    }
-                });
-                yPosition += 3;
+                
+                // Calcular o ponto médio para dividir os campos em duas colunas
+                const camposValidos = campos.filter(campo => campo.id && document.getElementById(campo.id));
+                const meio = Math.ceil(camposValidos.length / 2);
+                
+                // Posição inicial para ambas as colunas
+                const yInicial = yPosition;
+                let yColuna1 = yInicial;
+                let yColuna2 = yInicial;
+                
+                // Processar primeira coluna
+                for (let i = 0; i < meio; i++) {
+                    const campo = camposValidos[i];
+                    checkPageBreak(4);
+                    const valor = document.getElementById(campo.id).value || '-';
+                    pdf.setFont(undefined, 'normal');
+                    pdf.setFontSize(9);
+                    pdf.text(`${campo.label}: ${valor}`, marginLeft, yColuna1);
+                    yColuna1 += 4;
+                }
+                
+                // Processar segunda coluna
+                const coluna2X = marginLeft + 100; // Posição X da segunda coluna
+                for (let i = meio; i < camposValidos.length; i++) {
+                    const campo = camposValidos[i];
+                    checkPageBreak(4);
+                    const valor = document.getElementById(campo.id).value || '-';
+                    pdf.setFont(undefined, 'normal');
+                    pdf.setFontSize(9);
+                    pdf.text(`${campo.label}: ${valor}`, coluna2X, yColuna2);
+                    yColuna2 += 4;
+                }
+                
+                // Atualizar a posição Y para a maior altura entre as duas colunas
+                yPosition = Math.max(yColuna1, yColuna2) + 3;
             }
 
             // Seção 1: Inscrição Cadastral
@@ -2172,7 +2195,7 @@
     		    let fotoPorPagina = 0;
    		        pdf.addPage();
     		    yPosition = 15;
-    		    pdf.setFontSize(12);
+    		    pdf.setFontSize(10);
     		    pdf.setFont(undefined, 'bold');
     		    pdf.text('FOTOS DO PROJETO', marginLeft, yPosition);
     		    yPosition += 10;
@@ -2210,7 +2233,7 @@
                     const croquisData = canvas.toDataURL('image/png');
                     pdf.addPage();
                     yPosition = 20;
-                    pdf.setFontSize(12);
+                    pdf.setFontSize(10);
                     pdf.setFont(undefined, 'bold');
                     pdf.text('CROQUI SEM ESCALA', marginLeft, yPosition);
                     yPosition += 10;
