@@ -486,8 +486,8 @@
                     <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14" required>
                 </div>
                 <div class="form-group">
-                    <label>CNPJ:</label>
-                    <input type="text" id="cnpj" placeholder="00.000.000/0000-00" maxlength="18">
+                    <label>CNPJ: <span style="color: red;">*</span></label>
+                    <input type="text" id="cnpj" placeholder="00.000.000/0000-00" maxlength="18" required>
                 </div>
                 <div class="form-group">
                     <label>Cód. Logradouro:</label>
@@ -1830,68 +1830,84 @@
         function abrirMaps() { abrirCoordenadas(); }
 
         // Funções principais
-        function validarFormulario() {
-            let erros = [];
-
-            // Validar campos obrigatórios
-            const camposObrigatorios = [
-                { id: 'cpf', nome: 'CPF' },
-                
-            ];
-
-            camposObrigatorios.forEach(campo => {
-                const elemento = document.getElementById(campo.id);
-                if (!elemento.value.trim()) {
-                    erros.push(`${campo.nome} é obrigatório`);
-                    elemento.classList.add('error');
-                } else {
-                    elemento.classList.remove('error');
-                }
-            });
-
-            // Validar documentos (se preenchidos)
-            const cpfField = document.getElementById('cpf');
-            if (cpfField && cpfField.value.trim()) {
-                if (!validarCPF(cpfField.value)) {
-                    erros.push('CPF inválido');
-                    cpfField.classList.add('error');
-                } else {
-                    cpfField.classList.remove('error');
-                    cpfField.classList.add('success');
-                }
-            }
-
-            const cnpjField = document.getElementById('cnpj');
-            if (cnpjField && cnpjField.value.trim()) {
-                if (!validarCNPJ(cnpjField.value)) {
-                    erros.push('CNPJ inválido');
-                    cnpjField.classList.add('error');
-                } else {
-                    cnpjField.classList.remove('error');
-                    cnpjField.classList.add('success');
-                }
-            }
-
-            const pisField = document.getElementById('pis');
-            if (pisField && pisField.value.trim()) {
-                if (!validarPIS(pisField.value)) {
-                    erros.push('PIS/PASEP inválido');
-                    pisField.classList.add('error');
-                } else {
-                    pisField.classList.remove('error');
-                    pisField.classList.add('success');
-                }
-            }
-
-            if (erros.length > 0) {
-                alert('❌ Erros encontrados:\n\n' + erros.join('\n'));
-                return false;
-            } else {
-                alert('✅ Formulário validado com sucesso!\n🔍 Todos os documentos foram verificados.');
-                return true;
-            }
-        }
-
+	function validarFormulario() {
+	    let erros = [];
+	
+	    // Validar campos obrigatórios
+	    const camposObrigatorios = [
+	        // Outros campos obrigatórios podem ser adicionados aqui
+	    ];
+	
+	    camposObrigatorios.forEach(campo => {
+	        const elemento = document.getElementById(campo.id);
+	        if (!elemento.value.trim()) {
+	            erros.push(`${campo.nome} é obrigatório`);
+	            elemento.classList.add('error');
+	        } else {
+	            elemento.classList.remove('error');
+	        }
+	    });
+	
+	    // Declarar os campos uma única vez
+	    const cpfField = document.getElementById('cpf');
+	    const cnpjField = document.getElementById('cnpj');
+	    const pisField = document.getElementById('pis');
+	    
+	    const cpfPreenchido = cpfField && cpfField.value.trim();
+	    const cnpjPreenchido = cnpjField && cnpjField.value.trim();
+	
+	    // Validar que pelo menos um documento (CPF ou CNPJ) foi preenchido
+	    if (!cpfPreenchido && !cnpjPreenchido) {
+	        erros.push('É obrigatório preencher pelo menos um documento (CPF ou CNPJ)');
+	        if (cpfField) cpfField.classList.add('error');
+	        if (cnpjField) cnpjField.classList.add('error');
+	    } else {
+	        // Remove erro se pelo menos um estiver preenchido
+	        if (cpfField) cpfField.classList.remove('error');
+	        if (cnpjField) cnpjField.classList.remove('error');
+	    }
+	
+	    // Validar CPF (se preenchido)
+	    if (cpfPreenchido) {
+	        if (!validarCPF(cpfField.value)) {
+	            erros.push('CPF inválido');
+	            cpfField.classList.add('error');
+	        } else {
+	            cpfField.classList.remove('error');
+	            cpfField.classList.add('success');
+	        }
+	    }
+	
+	    // Validar CNPJ (se preenchido)
+	    if (cnpjPreenchido) {
+	        if (!validarCNPJ(cnpjField.value)) {
+	            erros.push('CNPJ inválido');
+	            cnpjField.classList.add('error');
+	        } else {
+	            cnpjField.classList.remove('error');
+	            cnpjField.classList.add('success');
+	        }
+	    }
+	
+	    // Validar PIS (se preenchido)
+	    if (pisField && pisField.value.trim()) {
+	        if (!validarPIS(pisField.value)) {
+	            erros.push('PIS/PASEP inválido');
+	            pisField.classList.add('error');
+	        } else {
+	            pisField.classList.remove('error');
+	            pisField.classList.add('success');
+	        }
+	    }
+	
+	    if (erros.length > 0) {
+	        alert('❌ Erros encontrados:\n\n' + erros.join('\n'));
+	        return false;
+	    } else {
+	        alert('✅ Formulário validado com sucesso!\n🔍 Todos os documentos foram verificados.');
+	        return true;
+	    }
+	}
         function salvarRascunho() {
             const formData = new FormData(document.getElementById('bciForm'));
             const data = Object.fromEntries(formData);
