@@ -1829,7 +1829,31 @@
 
         function abrirMaps() { abrirCoordenadas(); }
 
-        // Funções principais
+        // Adicionar esta função para tornar os campos mutuamente exclusivos
+	function configurarCamposExclusivos() {
+	    const cpfField = document.getElementById('cpf');
+	    const cnpjField = document.getElementById('cnpj');
+	
+	    if (cpfField && cnpjField) {
+	        // Quando CPF for preenchido, limpar CNPJ
+	        cpfField.addEventListener('input', function() {
+	            if (this.value.trim()) {
+	                cnpjField.value = '';
+	                cnpjField.classList.remove('error', 'success');
+	            }
+	        });
+	
+	        // Quando CNPJ for preenchido, limpar CPF
+	        cnpjField.addEventListener('input', function() {
+	            if (this.value.trim()) {
+	                cpfField.value = '';
+	                cpfField.classList.remove('error', 'success');
+	            }
+	        });
+	    }
+	}
+	
+	// Funções principais
 	function validarFormulario() {
 	    let erros = [];
 	
@@ -1856,13 +1880,17 @@
 	    const cpfPreenchido = cpfField && cpfField.value.trim();
 	    const cnpjPreenchido = cnpjField && cnpjField.value.trim();
 	
-	    // Validar que pelo menos um documento (CPF ou CNPJ) foi preenchido
+	    // Validar que exatamente um documento (CPF ou CNPJ) foi preenchido
 	    if (!cpfPreenchido && !cnpjPreenchido) {
-	        erros.push('É obrigatório preencher pelo menos um documento (CPF ou CNPJ)');
+	        erros.push('É obrigatório preencher um documento (CPF ou CNPJ)');
 	        if (cpfField) cpfField.classList.add('error');
 	        if (cnpjField) cnpjField.classList.add('error');
+	    } else if (cpfPreenchido && cnpjPreenchido) {
+	        erros.push('Preencha apenas um documento (CPF ou CNPJ), não ambos');
+	        cpfField.classList.add('error');
+	        cnpjField.classList.add('error');
 	    } else {
-	        // Remove erro se pelo menos um estiver preenchido
+	        // Remove erro se exatamente um estiver preenchido
 	        if (cpfField) cpfField.classList.remove('error');
 	        if (cnpjField) cnpjField.classList.remove('error');
 	    }
@@ -1908,6 +1936,11 @@
 	        return true;
 	    }
 	}
+	
+	// Chamar esta função quando a página carregar
+	document.addEventListener('DOMContentLoaded', function() {
+	    configurarCamposExclusivos();
+	});
         function salvarRascunho() {
             const formData = new FormData(document.getElementById('bciForm'));
             const data = Object.fromEntries(formData);
